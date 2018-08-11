@@ -5,7 +5,9 @@
 В поле «Обработчик» копируем и вставляем код из скачанного файла handler_paymaster.php.
 Нажимаем «Применить».
 В главном меню «Типовые динамические страницы» — «Интернет-магазин» — карандашик напротив «Интернет-магазин корзина» — «Настройка страницы» в поле «Настройка типовой динамической страницы» после $bCheckStock = TRUE; вставляем код обработчик Paymaster:
-if(isset($_REQUEST['LMI_MERCHANT_ID']))
+
+
+`if(isset($_REQUEST['LMI_MERCHANT_ID']))
 {
 	$order_id = intval(Core_Array::getRequest('LMI_PAYMENT_NO'));	
 	$oShop_Order = Core_Entity::factory('Shop_Order')->find($order_id);
@@ -15,6 +17,7 @@ if(isset($_REQUEST['LMI_MERCHANT_ID']))
 			->shopOrder($oShop_Order)
 			->paymentProcessing();
 	}
-}
+}`
+
 В коде обработчик Paymaster измените отредактируйте переменные $_merchant_id и $_secret_key.
 Модуль настроен, приятных платежей!
