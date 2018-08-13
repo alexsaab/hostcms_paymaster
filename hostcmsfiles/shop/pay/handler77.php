@@ -67,16 +67,12 @@ class Shop_Payment_System_Handler77 extends Shop_Payment_System_Handler
      */
     public function checkPaymentAfterContent()
     {
-        if (isset($_REQUEST['Pay']))
-        {
-            // Получаем ID заказа
-            $order_id = intval(Core_Array::getRequest('order_id'));
+        if(isset($_REQUEST['LMI_MERCHANT_ID'])) {
 
+            $order_id = intval(Core_Array::getRequest('LMI_PAYMENT_NO'));
             $oShop_Order = Core_Entity::factory('Shop_Order')->find($order_id);
-
             if (!is_null($oShop_Order->id))
             {
-                // Вызов обработчика платежной системы
                 Shop_Payment_System_Handler::factory($oShop_Order->Shop_Payment_System)
                     ->shopOrder($oShop_Order)
                     ->paymentProcessing();
