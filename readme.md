@@ -8,25 +8,7 @@
 В поле «Обработчик» копируем и вставляем код из скачанного файла handler_paymaster.php.
 Нажимаем «Применить».
 
-В главном меню «Типовые динамические страницы» — «Интернет-магазин» — карандашик напротив «Интернет-магазин корзина» — «Настройка страницы» в поле «Настройка типовой динамической страницы» после $bCheckStock = TRUE; вставляем код обработчик Paymaster:
+В коде обработчик Paymaster измените отредактируйте переменные $_merchant_id,  $_secret_key, выставляем правильный тип шифрования $_signature_method = 'sha256' или иной. 
+Ставки НДС выберуться сами в зависимости от ваших установок в товаре, который храниться в HostCMS
 
-
-`
-if(isset($_REQUEST['LMI_MERCHANT_ID']))
-{
-	
-	$order_id = intval(Core_Array::getRequest('LMI_PAYMENT_NO'));	
-	$oShop_Order = Core_Entity::factory('Shop_Order')->find($order_id);
-	if (!is_null($oShop_Order->id))
-	{
-		Shop_Payment_System_Handler::factory($oShop_Order->Shop_Payment_System)
-			->shopOrder($oShop_Order)
-			->paymentProcessing();
-	}
-	
-}
-`
-
-
-В коде обработчик Paymaster измените отредактируйте переменные $_merchant_id и $_secret_key.
 Модуль настроен, приятных платежей!
