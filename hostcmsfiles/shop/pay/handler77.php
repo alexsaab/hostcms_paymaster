@@ -61,6 +61,31 @@ class Shop_Payment_System_Handler77 extends Shop_Payment_System_Handler
         return $this;
     }
 
+
+    /**
+     * Метод, вызываемый в коде ТДС через Shop_Payment_System_Handler::checkAfterContent($oShop);
+     */
+    public function checkPaymentAfterContent()
+    {
+        if (isset($_REQUEST['Pay']))
+        {
+            // Получаем ID заказа
+            $order_id = intval(Core_Array::getRequest('order_id'));
+
+            $oShop_Order = Core_Entity::factory('Shop_Order')->find($order_id);
+
+            if (!is_null($oShop_Order->id))
+            {
+                // Вызов обработчика платежной системы
+                Shop_Payment_System_Handler::factory($oShop_Order->Shop_Payment_System)
+                    ->shopOrder($oShop_Order)
+                    ->paymentProcessing();
+            }
+        }
+    }
+
+
+
     /**
      * Сумма заказа в валюте платежной системы ($this->_currency)
      */
@@ -83,8 +108,8 @@ class Shop_Payment_System_Handler77 extends Shop_Payment_System_Handler
      */
     public function paymentProcessing()
     {
-        if (isset($_GET['payment'])) {
-            if ($_GET['payment'] == 'success' || $_GET['payment'] == 'fail') {
+        if (isset($_REQUEST['payment'])) {
+            if (Core_Array::getRequest('payment') == 'success' || Core_Array::getRequest('payment') == 'fail') {
                 $this->ShowResultMessage();
                 return true;
             }
@@ -107,8 +132,8 @@ class Shop_Payment_System_Handler77 extends Shop_Payment_System_Handler
      */
     function ProcessResult()
     {
-        if ($_SERVER["REQUEST_METHOD"] == "POST") {
-            if (isset($_POST["LMI_PREREQUEST"]) && ($_POST["LMI_PREREQUEST"] == "1" || $_POST["LMI_PREREQUEST"] == "2")) {
+        if (Core_Array::get($_SERVER, 'REQUEST_METHOD') == "POST") {
+            if (isset($_REQUEST["LMI_PREREQUEST"]) && (Core_Array::getRequest("LMI_PREREQUEST") == "1" || Core_Array::getRequest("LMI_PREREQUEST") == "2")) {
                 echo "YES";
                 die;
             } else {
@@ -120,7 +145,7 @@ class Shop_Payment_System_Handler77 extends Shop_Payment_System_Handler
 
                 $hash = $this->_getHash($_POST);
 
-                if ($_POST["LMI_HASH"] == $hash && $_POST["SIGN"] == $this->_getSign($_POST)) {
+                if (Core_Array::getRequest("LMI_HASH") == $hash && Core_Array::getRequest("SIGN") == $this->_getSign($_POST)) {
                     $this->shopOrder($oShop_Order)->shopOrderBeforeAction(clone $oShop_Order);
                     $oShop_Order->system_information = "Товар оплачен через Paymaster.\n";
                     $oShop_Order->paid();
@@ -175,9 +200,6 @@ class Shop_Payment_System_Handler77 extends Shop_Payment_System_Handler
         // Получение товарных позиций
         $items = $this->_getOrderItems($this->_shopOrder);
 
-        print "<pre>";
-        var_dump($items);
-        print "</pre>";
         foreach ($items as $pos => $item) {
             $fields['LMI_SHOPPINGCART.ITEMS[' . $pos . '].NAME'] = $item['name'];
             $fields['LMI_SHOPPINGCART.ITEMS[' . $pos . '].QTY'] = round($item['quantity'], 0);
